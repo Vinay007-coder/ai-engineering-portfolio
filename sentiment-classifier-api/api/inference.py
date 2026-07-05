@@ -9,14 +9,19 @@ import sys
 
 # train/ and api/ are sibling directories with no __init__.py, so neither is
 # a regular Python package. Adding the project root to sys.path lets us
-# import `train.dataset` / `train.model` as implicit namespace packages
+# import `train.vocab_utils` / `train.model` as implicit namespace packages
 # (a Python 3 feature that doesn't require __init__.py) instead of
 # duplicating tokenize/encode/model logic here.
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import torch
 
-from train.dataset import encode, load_vocab
+# Imported from train.vocab_utils, NOT train.dataset: vocab_utils.py has no
+# `datasets` import, while dataset.py does (for IMDBDataset, which downloads
+# IMDB — training-only). Importing from dataset.py here would transitively
+# pull `datasets`/`pyarrow` into the serving process for no reason, bloating
+# install size and memory on a constrained deploy target.
+from train.vocab_utils import encode, load_vocab
 from train.model import PAD_IDX, SentimentClassifier
 
 MAX_LEN = 256  # must match the max_len used in train/dataset.py, or token

@@ -1,4 +1,10 @@
-torch
-datasets
 fastapi
-uvicorn
+uvicorn[standard]
+# Without this line, pip resolves the default PyPI torch build, which bundles
+# CUDA GPU support and is several GB — meant for training on a GPU machine.
+# Render's free tier is CPU-only and has build size/time limits, so pulling
+# in gigabytes of unused CUDA libraries would blow past them for zero benefit
+# (there's no GPU to use them). This index serves a CPU-only torch wheel
+# instead, a small fraction of the size, which is all serving inference needs.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch

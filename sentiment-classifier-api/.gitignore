@@ -53,6 +53,16 @@ dist/
 models/*
 # Exception: keep the empty dir tracked so the expected folder structure exists on clone
 !models/.gitkeep
+# Exception: this deploys to Render's free tier, which has an EPHEMERAL
+# filesystem — anything not committed to git is gone after every redeploy or
+# restart, so the trained model/vocab MUST be in the repo or the API has
+# nothing to load at startup. A larger production system would instead pull
+# these from a model registry/S3/GCS at startup so the repo stays lean and
+# weights can be versioned/rotated independently of code — but standing that
+# up is overkill for one small learning-project model, so committing the two
+# artifacts directly is the simpler, deliberate tradeoff here.
+!models/sentiment_model.pt
+!models/vocab.json
 # Intermediate training checkpoints; large, ephemeral, tied to a specific training run
 checkpoints/
 # TensorBoard / experiment run logs; regenerated each training run
